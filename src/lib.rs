@@ -1,4 +1,3 @@
-use core::num::flt2dec::Formatted;
 use std::usize;
 
 use wasm_bindgen::prelude::*;
@@ -100,7 +99,7 @@ impl Universe {
         }
     }
 
-    pub fn render() {
+    pub fn render(&mut self) -> String {
         self.to_string()
     }
 }
