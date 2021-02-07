@@ -1,3 +1,4 @@
+use core::num::flt2dec::Formatted;
 use std::usize;
 
 use wasm_bindgen::prelude::*;
@@ -27,7 +28,7 @@ impl Universe {
         (row * self.width + column) as usize
     }
 
-    fn live_neighbor_count(&self, row: u32, column: u32) {
+    fn live_neighbor_count(&self, row: u32, column: u32) -> u8 {
         let mut count = 0;
         for delta_row in [self.height - 1, 0, 1].iter().cloned() {
             for delta_col in [self.width - 1, 0, 1].iter().cloned() {
@@ -36,7 +37,7 @@ impl Universe {
                 }
 
                 let neighbour_row = (row + delta_row) % self.height;
-                let neighbour_col = (col + delta_col) % self.width;
+                let neighbour_col = (column + delta_col) % self.width;
                 let idx = self.get_index(neighbour_row, neighbour_col);
                 count += self.cells[idx] as u8;
             }
@@ -76,5 +77,43 @@ impl Universe {
             }
         }
         self.cells = next;
+    }
+
+    pub fn new() -> Universe {
+        let width: u32 = 64;
+        let height: u32 = 64;
+
+        let cells = (0..width * height)
+            .map(|i| {
+                if i % 2 == 0 || i % 7 == 0 {
+                    Cell::Alive
+                } else {
+                    Cell::Dead
+                }
+            })
+            .collect();
+
+        Universe {
+            width,
+            height,
+            cells,
+        }
+    }
+
+    pub fn render() {
+        self.to_string()
+    }
+}
+
+impl std::fmt::Display for Universe {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        for line in self.cells.as_slice().chunks(self.width as usize) {
+            for &cell in line {
+                let symbol = if cell == Cell::Dead { '◻' } else { '◼' };
+                write!(f, "{}", symbol)?;
+            }
+            write!(f, "\n")?;
+        }
+        Ok(())
     }
 }
