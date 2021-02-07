@@ -5,11 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "build": "webpack --config webpack.config.js",
+    "serve": "webpack serve"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "wasm-game-of-life": "file:../pkg"
+    "copy-webpack-plugin": "^7.0.0",
+    "wasm-game-of-life": "file:../pkg",
+    "webpack": "^5.21.1",
+    "webpack-cli": "^4.5.0",
+    "webpack-dev-server": "^3.11.2"
   },
   "author": "",
   "license": "ISC",
