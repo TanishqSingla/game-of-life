@@ -2,6 +2,8 @@ use std::usize;
 
 use wasm_bindgen::prelude::*;
 
+extern crate js_sys;
+
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global allocator
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
@@ -43,6 +45,17 @@ impl Universe {
         }
         count
     }
+
+    pub fn get_cells(&self) -> &[Cell] {
+        &self.cells
+    }
+
+    pub fn set_cells(&mut self, cells: &[(u32, u32)]) {
+        for (row, col) in cells.iter().cloned() {
+            let idx = self.get_index(row, col);
+            self.cells[idx] = Cell::Alive;
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -83,8 +96,8 @@ impl Universe {
         let height: u32 = 64;
 
         let cells = (0..width * height)
-            .map(|i| {
-                if i % 2 == 0 || i % 7 == 0 {
+            .map(|_i| {
+                if js_sys::Math::random() < 0.5 {
                     Cell::Alive
                 } else {
                     Cell::Dead
@@ -99,10 +112,6 @@ impl Universe {
         }
     }
 
-    pub fn render(&self) -> String {
-        self.to_string()
-    }
-
     pub fn height(&self) -> u32 {
         self.height
     }
@@ -112,17 +121,14 @@ impl Universe {
     pub fn cells(&self) -> *const Cell {
         self.cells.as_ptr()
     }
-}
 
-impl std::fmt::Display for Universe {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        for line in self.cells.as_slice().chunks(self.width as usize) {
-            for &cell in line {
-                let symbol = if cell == Cell::Dead { '◻' } else { '◼' };
-                write!(f, "{}", symbol)?;
-            }
-            write!(f, "\n")?;
-        }
-        Ok(())
+    pub fn set_width(&mut self, width: u32) {
+        self.width = width;
+        self.cells = (0..width * self.height).map(|_i| Cell::Dead).collect();
+    }
+
+    pub fn set_height(&mut self, height: u32) {
+        self.height = height;
+        self.cells = (0..self.width * height).map(|_i| Cell::Dead).collect();
     }
 }
