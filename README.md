@@ -29,3 +29,13 @@ Considering you made your wasm package and installing the node modules, run the 
 ```sh
 npm run serve
 ```
+
+## Testing
+
+To test the program run the following command
+
+```sh
+wasm-pack test --firefox --headless
+```
+
+you can use `--chrome` `--safari` in place of `--firefox`
