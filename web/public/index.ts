@@ -6,6 +6,51 @@ const GRID_COLOR: string = "#ccc";
 const DEAD_COLOR = "#fff";
 const ALIVE_CELL = "#000";
 
+const fps = new (class {
+  fps: HTMLDivElement;
+  frames: number[];
+  lastTimeStamp: number;
+
+  constructor() {
+    this.fps = document.getElementById("fps") as HTMLDivElement;
+    this.frames = [];
+    this.lastTimeStamp = performance.now();
+  }
+
+  render() {
+    const now = performance.now();
+    const delta = now - this.lastTimeStamp;
+    this.lastTimeStamp = now;
+    const fps = (1 / delta) * 1000;
+
+    // save only latest 100 timings.
+    this.frames.push(fps);
+    if (this.frames.length > 100) {
+      this.frames.shift();
+    }
+
+    // Finding max, min and mean of timings
+    let min = Infinity;
+    let max = -Infinity;
+    let sum = 0;
+
+    for (let i = 0; i < this.frames.length; i++) {
+      sum += this.frames[i];
+      min = Math.min(this.frames[i], min);
+      max = Math.max(this.frames[i], max);
+    }
+    let mean = sum / this.frames.length;
+
+    // Rendering statistics
+    this.fps.textContent = `
+Frames per second:
+         latest = ${Math.round(fps)}
+avg of last 100 = ${Math.round(mean)}
+min of last 100 = ${Math.round(min)}
+max of last 100 = ${Math.round(max)}`.trim();
+  }
+})();
+
 const canvas = document.getElementById(
   "game-of-life-canvas"
 ) as HTMLCanvasElement;
@@ -113,8 +158,8 @@ const isPaused = (): Boolean => {
 };
 
 const renderLoop = () => {
+  fps.render();
   universe.tick();
-
   drawGrid();
   drawCells();
   animationId = requestAnimationFrame(renderLoop);
