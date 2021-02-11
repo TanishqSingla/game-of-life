@@ -4,7 +4,7 @@ import { memory } from "wasm-game-of-life/wasm_game_of_life_bg.wasm";
 const CELL_SIZE: number = 10;
 const GRID_COLOR: string = "#ccc";
 const DEAD_COLOR = "#fff";
-const ALIVE_CELL = "#000";
+const ALIVE_COLOR = "#000";
 
 const fps = new (class {
   fps: HTMLDivElement;
@@ -91,11 +91,32 @@ const drawCells = () => {
 
   ctx.beginPath();
 
-  for (let row: number = 0; row < height; row++) {
-    for (let col: number = 0; col < width; col++) {
+  ctx.fillStyle = ALIVE_COLOR;
+  // Alive cells
+  for (let row = 0; row < height; row++) {
+    for (let col = 0; col < width; col++) {
       const idx = getIndex(row, col);
+      if (cells[idx] !== Cell.Alive) {
+        continue;
+      }
 
-      ctx.fillStyle = cells[idx] === Cell.Dead ? DEAD_COLOR : ALIVE_CELL;
+      ctx.fillRect(
+        col * (CELL_SIZE + 1) + 1,
+        row * (CELL_SIZE + 1) + 1,
+        CELL_SIZE,
+        CELL_SIZE
+      );
+    }
+  }
+
+  // Dead cells
+  ctx.fillStyle = DEAD_COLOR;
+  for (let row = 0; row < height; row++) {
+    for (let col = 0; col < width; col++) {
+      const idx = getIndex(row, col);
+      if (cells[idx] !== Cell.Dead) {
+        continue;
+      }
 
       ctx.fillRect(
         col * (CELL_SIZE + 1) + 1,
