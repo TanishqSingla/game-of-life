@@ -64,12 +64,44 @@ const drawCells = () => {
   ctx.stroke();
 };
 
+// button mechanics
+let animationId: any = null;
+
+const playPauseButton = document.getElementById(
+  "play-pause"
+) as HTMLButtonElement;
+
+playPauseButton.textContent = animationId === null ? "⏸" : "▶";
+
+const play = () => {
+  playPauseButton.textContent = "⏸";
+  renderLoop();
+};
+
+const pause = () => {
+  playPauseButton.textContent = "▶";
+  cancelAnimationFrame(animationId);
+  animationId = null;
+};
+
+playPauseButton.addEventListener("click", () => {
+  if (isPaused()) {
+    play();
+  } else {
+    pause();
+  }
+});
+
+const isPaused = (): Boolean => {
+  return animationId === null;
+};
+
 const renderLoop = () => {
   universe.tick();
 
   drawGrid();
   drawCells();
-  requestAnimationFrame(renderLoop);
+  animationId = requestAnimationFrame(renderLoop);
 };
 
 drawGrid();
